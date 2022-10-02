@@ -1,30 +1,33 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
-  <router-view />
+  <main class="main">
+    <LeftMenu @goTab="goTab" :pageId="page.id" />
+    <router-view />
+    <PageAdmin class="" :page="page" />
+  </main>
 </template>
+<script setup lang="ts">
+import { useRoute } from "vue-router";
+import LeftMenu from "@/components/SideBar.vue";
+import PageAdmin from "@/components/PageAdmin.vue";
+import { IMenuList } from "@/interfaces";
+import { ref } from "vue";
+import IconUser from "@/components/icons/IconUser.vue";
+
+const page = ref({ id: "clients", title: "Clients", icon: IconUser });
+const goTab = (items: IMenuList): void => {
+  console.log(123);
+  page.value = items;
+};
+</script>
 
 <style lang="scss">
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
-nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
+.main {
+  flex: 1 1 auto;
 }
 </style>
