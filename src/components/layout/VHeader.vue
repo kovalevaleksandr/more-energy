@@ -1,19 +1,14 @@
 <template>
-  <div class="page">
-    <div class="page__container">
-      <div class="page__wrapper">
-        <div class="page__header">
-          <div class="page__title">{{ page.title }}</div>
-          <div class="page__user">
-            <div class="page__user-icon">
-              <span>{{ getUserIcon() }}</span>
-            </div>
-            <div class="page__user-name">{{ userName }}</div>
+  <div class="header">
+    <div class="header__container">
+      <div class="header__wrapper">
+        <div class="header__title">{{ props.page.title }}</div>
+        <div class="header__user">
+          <div class="header__user-icon">
+            <span>{{ getUserIcon() }}</span>
           </div>
+          <div class="header__user-name">{{ userName }}</div>
         </div>
-        <!--        <div class="page__content">-->
-        <!--          <component :is="tab()" />-->
-        <!--        </div>-->
       </div>
     </div>
   </div>
@@ -30,24 +25,9 @@ const getUserIcon = (): string => {
 const props = defineProps<{
   page: IMenuList;
 }>();
-
-// const tab = () => {
-//   switch (props.page.id) {
-//     case "clients":
-//       return VClients;
-//     case "coaches":
-//       return VCoaches;
-//     case "exercises":
-//       return VExercises;
-//     case "recipes":
-//       return VRecipes;
-//     case "articles":
-//       return VArticles;
-//   }
-// };
 </script>
 <style lang="scss" scoped>
-.page {
+.header {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -70,7 +50,7 @@ const props = defineProps<{
     color: #616972;
   }
 
-  &__header {
+  &__wrapper {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -95,6 +75,10 @@ const props = defineProps<{
       text-align: center;
       letter-spacing: 0.15px;
       color: #ffffff;
+    }
+
+    &-name {
+      margin-left: 1.2rem;
     }
   }
 }

@@ -1,49 +1,152 @@
 <template>
   <div class="clients">
     <div class="clients__toolbar">
-      <VToolbar />
+      <TableToolbar
+        @showAddModal="showAddModal"
+        @editUser="editClient"
+        @resetPassword="resetPassword"
+        :userSelectedId="userSelected.id || null"
+      />
     </div>
     <div class="clients__table">
       <MyTable
         :tableHeaders="clientsHeaders"
-        :tableRow="clients"
+        :tableRow="clientsData"
+        :clientsColumn="clientsColumn"
         type="clients"
+        @selectUser="selectUser"
+        :userSelectedId="userSelected.id"
       />
     </div>
+
+    <teleport to="body">
+      <VModal v-model:show="addClientModel">
+        <AddModal
+          title="New Client"
+          btnFirstName="cancel"
+          btnTwoName="save"
+          @addNewUser="addNewUser"
+        />
+      </VModal>
+    </teleport>
+
+    <teleport to="body">
+      <VModal v-model:show="editClientModel">
+        <EditModal
+          title="Edit Client"
+          btnFirstName="cancel"
+          btnTwoName="save"
+          :userSelected="userSelected"
+          @changeClient="changeClient"
+          @hideEditModal="hideEditModal"
+        />
+      </VModal>
+    </teleport>
+
+    <teleport to="body">
+      <VModal v-model:show="resetClientModel">
+        <manage-data><reset-pass-modal /></manage-data>
+        <EditModal
+          title="Edit Client"
+          btnFirstName="cancel"
+          btnTwoName="save"
+          :userSelected="userSelected"
+          @changeClient="changeClient"
+          @hideEditModal="hideEditModal"
+        />
+      </VModal>
+    </teleport>
   </div>
 </template>
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import axios from "axios";
-import VToolbar from "@/components/toolbars/TableToolbar.vue";
+import TableToolbar from "@/components/toolbars/TableToolbar.vue";
 import MyTable from "@/components/UI/VTable.vue";
+import VModal from "@/components/UI/VModal.vue";
+import EditModal from "@/components/modal/EditModal.vue";
+import AddModal from "@/components/modal/AddModal.vue";
+import { IClientsHeader } from "@/interfaces/Clients";
+import ResetPassModal from "@/components/modal/ResetPassModal.vue";
+import ManageData from "@/components/modal/ManageData.vue";
 
-const clients = ref([]);
+const clientsData = ref([]);
+
+const userSelected = ref({});
+
+const addClientModel = ref(false);
+const editClientModel = ref(false);
+const resetClientModel = ref(false);
+
+const showAddModal = () => {
+  addClientModel.value = true;
+};
+const editClient = () => {
+  editClientModel.value = true;
+};
+
+const changeClient = (changeClientData: object, newValue: object): void => {
+  const currentClientData = clientsData.value.find(
+    (i) => i.id === changeClientData.id
+  );
+  currentClientData.email = newValue.email;
+  currentClientData.name = newValue.name;
+  editClientModel.value = false;
+};
+
+const getPost = async () => {
+  try {
+    const response = await axios.get(
+      "https://jsonplaceholder.typicode.com/users?_limit=6"
+    );
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const resetPassword = () => {
+  resetClientModel.value = true;
+};
 
 onMounted(() => {
-  const getPost = async () => {
-    try {
-      const response = await axios.get(
-        "https://jsonplaceholder.typicode.com/users"
-      );
-      return response.data;
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  getPost()
+    .then((data) => {
+      clientsData.value = data;
+      return data;
+    })
+    .then((data) => {
+      clientsColumn.value = data.map((i: object) => Object.keys(i))[0];
 
-  getPost().then((data) => {
-    clients.value = data;
-  });
+      const arr = clientsHeaders.map((i) => i.id);
+
+      clientsColumn.value = clientsColumn.value.filter(
+        (i) => arr.indexOf(i) !== -1
+      );
+    });
 });
 
-const clientsHeaders: object[] = [
+const addNewUser = (newUser: object): void => {
+  clientsData.value.push(JSON.parse(JSON.stringify(newUser)));
+};
+
+const clientsColumn = ref([]);
+
+const clientsHeaders: IClientsHeader[] = [
   { id: "id", title: "ID" },
   { id: "name", title: "NAME" },
   { id: "email", title: "EMAIL" },
   { id: "mobile", title: "MOBILE" },
   { id: "coaches", title: "Coaches" },
 ];
+
+const selectUser = (th: object) => {
+  userSelected.value = th;
+};
+
+const hideEditModal = () => {
+  editClientModel.value = false;
+};
 </script>
 <style lang="scss" scoped>
 .clients {

@@ -1,20 +1,22 @@
 <template>
   <div class="exercises">
-    <div class="exercises__list">
+    <SearchToolbar class="exercises__toolbar" />
+    <PostList class="exercises__list">
       <VPost
         class="exercises__item"
         v-for="exercise in exercises"
         :key="exercise.id"
         :object="exercise"
       />
-    </div>
+    </PostList>
   </div>
 </template>
 <script setup lang="ts">
-import VExercise from "@/components/page/exercises/VExercise.vue";
 import { onMounted, ref } from "vue";
 import axios from "axios";
-import VPost from "@/components/VPost.vue";
+import VPost from "@/components/post/PostItem.vue";
+import PostList from "@/components/post/PostList.vue";
+import SearchToolbar from "@/components/toolbars/SearchToolbar.vue";
 
 const exercises = ref([]);
 
@@ -37,13 +39,8 @@ onMounted(() => {
 </script>
 <style lang="scss">
 .exercises {
-  &__list {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 2rem;
-  }
-
-  &__item {
-  }
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 }
 </style>

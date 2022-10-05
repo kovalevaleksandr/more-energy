@@ -1,5 +1,11 @@
 <template>
-  <input type="text" :value="modelValue" @input="getValue" />
+  <input
+    class="input"
+    type="text"
+    :value="modelValue"
+    @input="getValue"
+    v-bind="$attrs"
+  />
 </template>
 <script setup lang="ts">
 defineProps<{

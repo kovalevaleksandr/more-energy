@@ -1,11 +1,9 @@
 <template>
   <div class="sidebar">
     <div class="sidebar__logo">
-      <img
-        class="menu__logo-img"
-        src="@/assets/images/logo.svg"
-        alt="MORE/ENERGY"
-      />
+      <router-link class="sidebar__link" to="/"
+        ><img src="@/assets/images/logo.svg" alt="MORE/ENERGY"
+      /></router-link>
     </div>
     <div class="sidebar__list">
       <div
@@ -15,8 +13,8 @@
         :class="{ 'menu__item--active': item.id === props.pageId }"
         @click="goTab(item)"
       >
-        <router-link :to="toPage">
-          <i class="menu__item-icon">
+        <router-link class="sidebar__link" :to="toPage(item.id)">
+          <i class="sidebar__icon">
             <IconBase
               width="20"
               height="20"
@@ -44,12 +42,10 @@ import IconSampleMenu from "@/components/icons/IconSampleMenu.vue";
 import IconDumbbell from "@/components/icons/IconDumbbell.vue";
 import IconPieChart from "@/components/icons/IconPieChart .vue";
 import { IMenuList } from "@/interfaces";
-import { useRouter, useRoute } from "vue-router";
-import { computed } from "vue";
 
-const toPage = computed(() => {
-  return "/" + props.pageId;
-});
+const toPage = (id: string) => {
+  return "/" + id;
+};
 
 const emit = defineEmits(["goTab"]);
 
@@ -75,25 +71,19 @@ const goTab = (title: IMenuList): void => {
 </script>
 <style lang="scss" scoped>
 .sidebar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
   padding: 2.8rem 0;
   background-color: #416186;
-  max-width: 7.2rem;
-  width: 100%;
 
   &__logo {
     width: 5.6rem;
     height: 5.8rem;
     margin-bottom: 2.8rem;
 
-    &-img {
+    & img {
       display: block;
       width: 100%;
       height: 100%;
@@ -109,14 +99,12 @@ const goTab = (title: IMenuList): void => {
     height: 100%;
   }
 
-  &__item {
+  &__link {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
     width: 100%;
-    cursor: pointer;
-    padding: 1.4rem 0;
     font-family: "Roboto", sans-serif;
     font-style: normal;
     font-weight: 500;
@@ -125,6 +113,16 @@ const goTab = (title: IMenuList): void => {
     text-align: center;
     letter-spacing: 0.15px;
     color: #bedcff;
+    padding: 1.4rem 0;
+  }
+
+  &__item {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    cursor: pointer;
 
     &:hover {
       background-color: #2f4a69;
@@ -133,10 +131,10 @@ const goTab = (title: IMenuList): void => {
     &--active {
       background-color: #2f4a69;
     }
+  }
 
-    &-icon {
-      margin-bottom: 1.6rem;
-    }
+  &__icon {
+    margin-bottom: 1.6rem;
   }
 }
 </style>

@@ -34,7 +34,6 @@ const hideDialog = (): void => {
 
   &__content {
     margin: auto;
-    background-color: #ffffff;
     z-index: 999;
   }
 }

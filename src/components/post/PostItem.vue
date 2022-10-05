@@ -8,21 +8,26 @@
         {{ props.object.id }}
       </div>
       <div class="item__title">
+        123333333333
         {{ props.object.title }}
       </div>
       <div class="item__desc">
         {{ props.object.id }}
       </div>
+      <!--      <VMore :title="props.object.title" @update:modelValue="abc" />-->
       <CardToolbar class="item__toolbar" />
     </div>
   </div>
 </template>
 <script setup lang="ts">
 import CardToolbar from "@/components/toolbars/CardToolbar.vue";
-
+import VMore from "@/components/post/VMore";
+import { ref } from "vue";
 const props = defineProps<{
   object: object;
 }>();
+
+const abc = ref("");
 </script>
 <style lang="scss" scoped>
 .item {
@@ -35,6 +40,7 @@ const props = defineProps<{
   border-radius: 4px;
 
   &__wrapper {
+    width: 100%;
     padding: 2rem 1.6rem;
   }
 

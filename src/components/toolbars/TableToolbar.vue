@@ -1,13 +1,25 @@
 <template>
   <div class="toolbar">
-    <MyButton class="toolbar__btn" color="#7CAF8A" @click="addNewUser">
+    <MyButton class="toolbar__btn" color="#7CAF8A" @click="showAddModal">
       <IconBase width="20" height="20" icon-name="write" icon-color="#FFFFFF">
         <IconPlusSmall />
       </IconBase>
       <span>New user</span>
     </MyButton>
-    <MyButton class="toolbar__btn" @click="editUser">Edit</MyButton>
-    <p class="toolbar__reset">Reset password</p>
+    <MyButton
+      class="toolbar__btn"
+      @click="editUser"
+      :class="{ 'toolbar__btn--disable': !props.userSelectedId }"
+      :disabled="!props.userSelectedId"
+      >Edit</MyButton
+    >
+    <p
+      class="toolbar__reset"
+      :class="{ 'toolbar__reset--active': props.userSelectedId }"
+      @click="resetPassword"
+    >
+      Reset password
+    </p>
   </div>
 </template>
 <script setup lang="ts">
@@ -15,14 +27,22 @@ import MyButton from "@/components/UI/VButton.vue";
 import IconBase from "@/components/icons/IconBase.vue";
 import IconPlusSmall from "@/components/icons/IconPlusSmall.vue";
 
-const emit = defineEmits(["addNewUser", "editUser"]);
+const emit = defineEmits(["showAddModal", "editUser", "resetPassword"]);
 
-const addNewUser = () => {
-  emit("addNewUser");
+const props = defineProps<{
+  userSelectedId: number | null;
+}>();
+
+const showAddModal = () => {
+  emit("showAddModal");
 };
 
 const editUser = () => {
   emit("editUser");
+};
+
+const resetPassword = () => {
+  if (props.userSelectedId) emit("resetPassword");
 };
 </script>
 <style scoped lang="scss">
@@ -61,6 +81,19 @@ const editUser = () => {
 
     &:last-of-type {
       margin-right: 2.4rem;
+    }
+
+    &--disable {
+      opacity: 0.5;
+    }
+  }
+
+  &__reset {
+    opacity: 0.5;
+    cursor: pointer;
+
+    &--active {
+      opacity: 1;
     }
   }
 }

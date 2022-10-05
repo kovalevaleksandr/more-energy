@@ -1,94 +1,141 @@
 <template>
-  <table class="table">
+  <table>
     <thead>
       <tr>
-        <th v-for="th of props.tableHeaders" :key="th.key">
+        <th
+          v-for="th of props.tableHeaders"
+          :key="th.key"
+          @click="sortTable(th.id)"
+        >
           {{ th.title }}
         </th>
       </tr>
     </thead>
-    <tbody v-if="props.type === 'clients'">
-      <tr v-for="td of props.tableRow" :key="td.id">
-        <td>{{ td.id }}</td>
-        <td>{{ td.name }}</td>
-        <td>{{ td.email }}</td>
-        <td>{{ td.mobile }}</td>
-        <td>{{ td.coaches }}</td>
-      </tr>
-    </tbody>
-    <tbody v-if="props.type === 'coaches'">
-      <tr v-for="td of props.tableRow" :key="td.id">
-        <td>{{ td.id }}</td>
-        <td>{{ td.name }}</td>
-        <td>{{ td.phoneNumber }}</td>
-        <td>{{ td.assignedClients }}</td>
-        <td>{{ td.permission }}</td>
+    <tbody>
+      <tr
+        v-for="td of sortedEntries"
+        :key="td.id"
+        @click="selectUser(td)"
+        :class="{ 'tr--active': td.id === props.userSelectedId }"
+      >
+        <td v-for="(item, index) of props.clientsColumn" :key="index">
+          {{ td[item] }}
+        </td>
       </tr>
     </tbody>
   </table>
 </template>
 <script setup lang="ts">
+import { computed, ref } from "vue";
+
 const props = defineProps<{
   tableHeaders: object[];
   tableRow: object[];
   type: string;
+  clientsColumn: [];
+  userSelectedId: number;
 }>();
+
+const emit = defineEmits(["selectUser"]);
+
+const ascendTable = ref(true);
+const sortByColumn = ref("");
+
+const sortTable = (id: string) => {
+  sortByColumn.value = id;
+  if (id === sortByColumn.value) {
+    ascendTable.value = !ascendTable.value;
+  }
+};
+
+const sorted = {
+  idTh: (ascendTable: boolean, tableData: []) => {
+    if (ascendTable) {
+      return [...tableData].sort((a, b) => a.id - b.id);
+    } else {
+      return [...tableData].sort((a, b) => b.id - a.id);
+    }
+  },
+  valueTh: (ascendTable: boolean, tableData: []) => {
+    if (ascendTable) {
+      return [...tableData].sort((a, b) =>
+        a[sortByColumn.value]?.localeCompare(b[sortByColumn.value])
+      );
+    } else {
+      return [...tableData].sort((a, b) =>
+        b[sortByColumn.value]?.localeCompare(a[sortByColumn.value])
+      );
+    }
+  },
+};
+
+const sortedEntries = computed(() => {
+  if (!sortByColumn.value) {
+    return props.tableRow;
+  }
+  if (sortByColumn.value === "id") {
+    return sorted.idTh(ascendTable.value, props.tableRow);
+  } else {
+    return sorted.valueTh(ascendTable.value, props.tableRow);
+  }
+});
+
+const selectUser = (th: object) => {
+  emit("selectUser", th);
+};
 </script>
 <style lang="scss" scoped>
-.table {
+table {
+  width: 100%;
   background: #ffffff;
+  border-collapse: collapse;
+  table-layout: auto;
+}
 
-  & thead tr {
+th {
+  font-family: "Roboto", sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 10px;
+  line-height: 12px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #a4adb6;
+  padding: 1.2rem 1.6rem;
+}
+
+tr {
+  cursor: pointer;
+  //border-bottom: 1px solid transparent;
+  border-top: 1px solid transparent;
+
+  tbody &:hover {
+    border-bottom: 1px solid #bcc4cd !important;
+    border-top: 1px solid #bcc4cd !important;
   }
+}
 
-  & th {
-    font-family: "Roboto", sans-serif;
-    font-style: normal;
-    font-weight: 400;
-    font-size: 10px;
-    line-height: 12px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: #a4adb6;
-    padding: 1.2rem 1.6rem;
+td {
+  font-family: "Roboto", sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 18px;
+  text-align: left;
+  color: #383e45;
+  padding: 1.2rem 1.6rem;
+}
 
-    &:nth-child(1) {
-      width: 4.5%;
-    }
-    &:nth-child(2) {
-      width: 14%;
-    }
-    &:nth-child(3) {
-      width: 14%;
-    }
-    &:nth-child(4) {
-      width: 13%;
-    }
-    &:nth-child(5) {
-      width: 53%;
-    }
-  }
+td:first-child {
+  text-align: center;
+}
 
-  & tr {
-    cursor: pointer;
+.tr--active {
+  border-bottom: 1px solid #bcc4cd !important;
+  border-top: 1px solid #bcc4cd !important;
+}
 
-    &:hover td {
-      border-bottom: 1px solid #bcc4cd;
-      border-top: 1px solid #bcc4cd;
-    }
-  }
-
-  & td {
-    font-family: "Roboto", sans-serif;
-    font-style: normal;
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 18px;
-    text-align: center;
-    color: #383e45;
-    padding: 1.2rem 1.6rem;
-    border-bottom: 1px solid transparent;
-    border-top: 1px solid transparent;
-  }
+tbody tr:hover + tr td {
+  border-top-color: red; /* change any cells without a bottom border - make the next row have top border go red (so it looks like current row bottom border) */
 }
 </style>

@@ -7,17 +7,24 @@
       <MyTable
         :table-headers="coachesHeaders"
         :table-row="coaches"
+        :clientsColumn="coachesColumn"
         type="coaches"
       />
     </div>
 
     <teleport to="body">
-      <VModal v-model:show="addCoachModel"><DataModal /></VModal>
+      <VModal v-model:show="addCoachModel">
+        <AddModal
+          title="New Coach"
+          btnFirstName="save"
+          @addNewUser="addNewUser"
+        />
+      </VModal>
     </teleport>
 
     <teleport to="body">
       <VModal v-model:show="editCoachModel">
-        <DataModal />
+        <AddModal title="Edit Coach" btnFirstName="cancel" btnTwoName="save" />
       </VModal>
     </teleport>
   </div>
@@ -26,12 +33,9 @@
 import VToolbar from "@/components/toolbars/TableToolbar.vue";
 import MyTable from "@/components/UI/VTable.vue";
 import VModal from "@/components/UI/VModal.vue";
-import VButton from "@/components/UI/VButton.vue";
+import AddModal from "@/components/modal/AddModal.vue";
 import { ref, onMounted } from "vue";
 import axios from "axios";
-import VInput from "@/components/UI/VInput.vue";
-
-const newUser = ref({ name: "", email: "" });
 
 const coachesHeaders: object[] = [
   { id: "id", title: "ID" },
@@ -46,21 +50,8 @@ const coaches = ref([]);
 const addCoachModel = ref(false);
 const editCoachModel = ref(false);
 
-onMounted(() => {
-  getCoaches().then((data) => {
-    coaches.value = data;
-  });
-});
-
-const getCoaches = async () => {
-  try {
-    const response = await axios.get(
-      "https://jsonplaceholder.typicode.com/users"
-    );
-    return response.data;
-  } catch (error) {
-    console.error(error);
-  }
+const addNewUser = (user: object) => {
+  coaches.value.push(user);
 };
 
 const addNewCoaches = () => {
@@ -68,7 +59,31 @@ const addNewCoaches = () => {
 };
 
 const editCoaches = () => {
-  addCoachModel.value = true;
+  editCoachModel.value = true;
+};
+
+onMounted(() => {
+  getCoaches()
+    .then((data) => {
+      coaches.value = data;
+      return data;
+    })
+    .then((data) => {
+      coachesColumn.value = data.map((i: object) => Object.keys(i))[0];
+    });
+});
+
+const coachesColumn = ref([]);
+
+const getCoaches = async () => {
+  try {
+    const response = await axios.get(
+      "https://jsonplaceholder.typicode.com/users?_limit=2"
+    );
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
 };
 </script>
 <style lang="scss" scoped>
